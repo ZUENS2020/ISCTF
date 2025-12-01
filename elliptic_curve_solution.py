@@ -45,7 +45,6 @@ Note: This is an advanced ECDLP problem. The solution likely requires:
 - Or additional problem context (e.g., the generator point)
 """
 
-from Crypto.Util.number import *
 import hashlib
 
 # Given point Q
@@ -67,13 +66,8 @@ print(f"Point Q verification: {verify_point(x_Q, y_Q, a, b, p)}")
 
 # Helper functions for ECC operations
 def modinv(a, m):
-    def extended_gcd(a, b):
-        if a == 0:
-            return b, 0, 1
-        gcd, x1, y1 = extended_gcd(b % a, a)
-        return gcd, y1 - (b // a) * x1, x1
-    g, x, _ = extended_gcd(a % m, m)
-    return x % m if g == 1 else None
+    """Compute modular inverse using Python's built-in pow()"""
+    return pow(a, -1, m)
 
 def point_add(P1, P2, a, p):
     if P1 is None: return P2
@@ -94,10 +88,13 @@ def point_mul(k, P, a, p):
     if k == 0:
         return None
     if k < 0:
-        P = (P[0], (-P[1]) % p)
+        # Create new tuple instead of modifying P in-place
+        work_point = (P[0], (-P[1]) % p)
         k = -k
+    else:
+        work_point = P
     result = None
-    addend = P
+    addend = work_point
     while k:
         if k & 1:
             result = point_add(result, addend, a, p)
@@ -114,6 +111,19 @@ def generate_flag(k):
 # If k is found, call generate_flag(k)
 # Example: print(generate_flag(12345))
 
+# Possible k candidates based on analysis
+# These are computed dynamically using generate_flag()
+CANDIDATE_K_VALUES = [1, 2, 3, 4, 9, 27, 81, 5, 83, 9907]
+CANDIDATE_K_COMMENTS = {
+    3: "a = 3",
+    9: "b/a = 9",
+    27: "b = 27",
+    81: "a*b = 81",
+    5: "factor of y² - x³ - 3x - 27",
+    83: "factor of y² - x³ - 3x - 27",
+    9907: "factor of y² - x³ - 3x - 27",
+}
+
 if __name__ == "__main__":
     print(f"Curve: y² = x³ + {a}x + {b} (mod p)")
     print(f"Prime p ({p.bit_length()} bits): {p}")
@@ -121,3 +131,13 @@ if __name__ == "__main__":
     print(f"\nTo solve: Find k such that Q = k * G for generator G")
     print(f"\nNote: Without knowing G or having a weak curve, this ECDLP")
     print(f"      cannot be solved with standard methods for such a large prime.")
+    
+    print(f"\n\n=== Possible Flag Candidates ===")
+    print("Based on analysis, k might be one of these values:")
+    for k in CANDIDATE_K_VALUES:
+        flag = generate_flag(k)
+        comment = CANDIDATE_K_COMMENTS.get(k, "")
+        if comment:
+            print(f"  k = {k} ({comment}): {flag}")
+        else:
+            print(f"  k = {k}: {flag}")
