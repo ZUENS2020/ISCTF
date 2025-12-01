@@ -64,8 +64,11 @@ N = NTsin
 **关键发现**: PNG 文件末尾附加了一个 ZIP 文件！
 
 ```bash
-# 使用 xxd 查看文件末尾
-xxd TiTan.png | tail -20
+# 使用 xxd 查看文件末尾 (从偏移量 0x421ff0 开始)
+xxd TiTan.png | tail -n 50
+
+# 或者直接查看 IEND 后的数据
+xxd -s 0x421ff0 -l 100 TiTan.png
 ```
 
 可以看到在 PNG 的 IEND 标记后面有 PK 签名（ZIP 文件头）：
@@ -126,8 +129,10 @@ ISCTF{flag1_flag2_flag3}
 # 解压原始压缩包
 unzip zip -d challenge/
 
-# 查看 docx 中的隐藏文字
-unzip -p "阿利维亚的传说.docx" word/document.xml | grep -o "<w:vanish.*</w:t>"
+# 查看 docx 中的隐藏文字 (解压后查看 XML)
+unzip "阿利维亚的传说.docx" -d docx_content/
+# 然后在 docx_content/word/document.xml 中搜索 <w:vanish/> 标记
+grep -A 5 "w:vanish" docx_content/word/document.xml
 
 # 提取 PNG 中的隐藏 ZIP
 dd if=TiTan.png of=hidden.zip bs=1 skip=4333569
