@@ -33,12 +33,12 @@ msiexec.exe /i TJe1w TRANSFORMS=fR6Wl /qn
 ### 问题4: 第一阶段中恶意载荷释放的文件名分别为
 **答案1: zRCAppCore.dll** (恶意DLL，伪装成Zoom合法DLL)
 **答案2: zRC.dat** (数据文件)
-**答案3: ISCTF2025.pdf** (PDF诱饵文件)
+**答案3: ISCTF2025基础规则说明文档.pdf** (PDF诱饵文件)
 
 分析: Transform文件(fR6Wl)修改MSI安装包后，zRC.dll从资源中提取并释放:
 - 恶意DLL写入 `\ZoomRemoteControl\bin\zRCAppCore.dll`
 - 数据文件写入 `\ZoomRemoteControl\bin\zRC.dat`
-- PDF诱饵文件 `\ISCTF2025.pdf` 并用ShellExecute打开
+- PDF诱饵文件 `\ISCTF2025基础规则说明文档.pdf` 并用ShellExecute打开
 
 ---
 
@@ -126,7 +126,7 @@ msiexec.exe /i TJe1w TRANSFORMS=fR6Wl /qn
 | 入口文件 | ISCTF基础规则说明文档.pdf.lnk |
 | 恶意DLL (黑文件) | zRCAppCore.dll |
 | 释放的数据文件 | zRC.dat |
-| PDF诱饵 | ISCTF2025.pdf |
+| PDF诱饵 | ISCTF2025基础规则说明文档.pdf |
 | C2域名 | colonised-my.sharepoint.com |
 | User-Agent | Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36 Edg/142.0.0.0 |
 | 持久化 | 计划任务 ZoomUpdater (每小时执行) |
