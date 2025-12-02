@@ -106,7 +106,7 @@ msiexec.exe /i TJe1w TRANSFORMS=fR6Wl /qn
 ```
 入口点 → Stage 1 → Stage 2 → Stage 3
    │         │          │          │
-   │         │          │          └─ UPX压缩的RAT,使用SharePoint C2
+   │         │          │          └─ UPX压缩的RAT, 使用SharePoint C2
    │         │          └─ DLL侧加载 + 进程注入(dllhost.exe)
    │         └─ MSI + Transform安装恶意DLL
    └─ LNK快捷方式诱饵
