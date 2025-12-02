@@ -26,7 +26,7 @@ unzip -P 123456 challenge.zip
 ### 第四步：数据提取 / Step 4: Data Extraction
 从第一行RGB通道提取LSB数据：
 - 前4字节: `[80, 0, 0, 0]`
-- 80 = ASCII 'P'
+- 80 = 0x50，这是 'f' XOR '6' 的结果 (即 102 XOR 54 = 80)
 
 ### 第五步：XOR分析 / Step 5: XOR Analysis
 关键发现：
@@ -64,12 +64,14 @@ meaningful = bits[:last_0+1]
 
 # Convert to bytes - 转换为字节
 hidden = []
-for i in range(0, len(meaningful) - 7, 8):
-    hidden.append(int(meaningful[i:i+8], 2))
+for i in range(0, len(meaningful), 8):
+    if i + 8 <= len(meaningful):
+        hidden.append(int(meaningful[i:i+8], 2))
 
 # XOR with key - 用密钥进行XOR
 key = "6lag{f4k3_s1gn1_in_hhh}"
-result = [hidden[i] ^ ord(key[i % len(key)]) for i in range(len(hidden))]
+key_len = len(key)
+result = [hidden[i] ^ ord(key[i % key_len]) for i in range(len(hidden))]
 flag = ''.join(chr(b) if 32 <= b < 127 else '?' for b in result)
 print(flag)  # Starts with "flag"
 ```
