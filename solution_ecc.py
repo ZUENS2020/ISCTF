@@ -153,14 +153,21 @@ def solve():
     print("ANSWER:")
     print("="*60)
     
-    # Given the hint "这只是个ez题，别想太复杂" 
-    # ("This is just an easy problem, don't think too complicated")
-    # The intended answer is most likely the simplest one: p=59, k=36
-    print("\nFor an 'easy' problem, p=59 gives the simplest k=36:")
-    print("\n  *** FLAG: ISCTF{1ff1de774005f8da13f42943881c655f} ***")
-    print("\n  (k = 36 = 0x24)")
+    # The correct solution uses p = 9x - y (the full product of all prime factors)
+    # In this case, k = x * inverse(3) mod p = x // 3
+    p_full = 9 * x - y
+    k_correct = x // 3
+    hex_k_correct = format(k_correct, 'x')
+    md5_correct = hashlib.md5(hex_k_correct.encode()).hexdigest()
     
-    return "ISCTF{1ff1de774005f8da13f42943881c655f}"
+    print(f"\nWith p = 9x - y (full value):")
+    print(f"  p = {p_full}")
+    print(f"  k = x // 3 = {k_correct}")
+    print(f"  hex(k) = '{hex_k_correct}'")
+    print(f"  MD5 = {md5_correct}")
+    print(f"\n  *** FLAG: ISCTF{{{md5_correct}}} ***")
+    
+    return f"ISCTF{{{md5_correct}}}"
 
 if __name__ == "__main__":
     solve()
