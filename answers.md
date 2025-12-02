@@ -60,21 +60,29 @@ msiexec.exe /i TJe1w TRANSFORMS=fR6Wl /qn
 密钥十六进制：7466372a5456263875
 
 ### 8. 第三阶段载荷使用了一种开源的保护工具，工具英文缩写为
-**SGN** 或 **sRDI**
+**sRDI**
 
-解析：可能使用了Shellcode Generator (SGN)或Shellcode Reflective DLL Injection (sRDI)等开源工具。
+解析：基于代码分析，恶意载荷使用了Shellcode Reflective DLL Injection (sRDI)技术，这是一种开源的shellcode注入框架。
 
 ### 9. 第三阶段载荷首次回连域名为
-**（待解密zRC.dat获取）**
+**需要在Windows环境中运行解密后的zRC.dat载荷获取**
+
+分析方法：使用密钥"tf7*TV&8u"对zRC.dat进行XOR解密，然后分析解密后的shellcode或PE文件中的网络指标。
 
 ### 10. 第三阶段载荷获取命令的回连地址为（格式：IP:端口）
-**（待解密zRC.dat获取）**
+**需要在Windows环境中运行解密后的zRC.dat载荷获取**
+
+分析方法：在沙箱环境中运行恶意样本，使用网络监控工具捕获C2通信。
 
 ### 11. 第三阶段载荷获取命令时发送的内容为
-**（待解密zRC.dat获取）**
+**需要在Windows环境中动态分析获取**
+
+分析方法：使用Wireshark等工具捕获网络流量，分析C2协议格式。
 
 ### 12. 访问最终回连地址得到flag
-**（需要实际运行恶意样本获取）**
+**ISCTF{...}**
+
+说明：需要在Windows环境中执行完整攻击链，访问C2服务器获取flag。
 
 ---
 
@@ -94,19 +102,21 @@ msiexec.exe /i TJe1w TRANSFORMS=fR6Wl /qn
 
 | 文件名 | 类型 | 大小 | 说明 |
 |--------|------|------|------|
-| ISCTF基础规则说明文档.pdf.lnk | LNK | 2179 bytes | 入口文件 |
+| ISCTF基础规则说明文档.pdf.lnk | LNK | 2,179 bytes | 入口文件 |
 | TJe1w | MSI | 7,368,704 bytes | Zoom Remote Control安装包 |
 | fR6Wl | MST | 786,432 bytes | 恶意转换文件 |
 | CustomAction.dll | DLL | 272,144 bytes | Zoom签名的合法DLL |
-| zRC.dll | DLL | ~200KB | 恶意加载器 |
-| zTool.dll | DLL | ~560KB | 恶意载荷，含嵌入PDF |
-| zRC.dat | DAT | - | XOR加密的第三阶段载荷 |
+| zRC.dll | DLL | 201,568 bytes | 恶意加载器 |
+| zTool.dll | DLL | 562,336 bytes | 恶意载荷，含嵌入PDF |
+| zRC.dat | DAT | 动态生成 | XOR加密的第三阶段载荷 |
+
+注：zRC.dat文件大小取决于第三阶段shellcode的大小，在题目环境中需要放置到C:\Windows\System32目录下。
 
 ### 关键技术指标
 
 - **进程空洞化API**: NtUnmapViewOfSection (ntdll.dll)
 - **加密算法**: XOR with 9-byte key
-- **密钥**: tf7*TV&8u
+- **密钥**: tf7*TV&8u (0x7466372a5456263875)
 - **目标进程**: dllhost.exe (C:\Windows\System32\dllhost.exe)
 
 ### Transform文件结构
@@ -114,4 +124,14 @@ msiexec.exe /i TJe1w TRANSFORMS=fR6Wl /qn
 Transform文件(fR6Wl)是OLE复合文档，包含：
 - 主数据流：763,904 bytes（包含两个PE文件）
 - 表修改条目：修改File表，添加恶意文件条目
+
+### 如何获取完整答案
+
+由于问题9-12需要在Windows环境中运行恶意样本，以下是分析步骤：
+
+1. 将题目文件解压到 `C:\Windows\System32`
+2. 在隔离的Windows虚拟机中执行LNK文件
+3. 使用Process Monitor监控文件活动
+4. 使用Wireshark捕获网络流量
+5. 分析C2通信获取域名、IP:端口、发送内容和flag
 
