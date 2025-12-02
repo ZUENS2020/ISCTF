@@ -110,7 +110,47 @@ Submit these three file names (one at a time):
 ---
 
 ### 12. 访问最终回连地址得到flag
-*To obtain the flag, connect to the C2 server at 108.68.49.98:6957 (or alternate ports) and send "get_cmd". The flag is returned by the server.*
+
+**连接C2服务器获取flag的方法：**
+
+方法1 - 使用 netcat (推荐):
+```bash
+echo "get_cmd" | nc 108.68.49.98 6957
+```
+
+方法2 - 使用 Python:
+```python
+import socket
+
+# 创建TCP连接
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+s.connect(("108.68.49.98", 6957))
+
+# 发送命令
+s.send(b"get_cmd")
+
+# 接收flag
+response = s.recv(1024)
+print(response.decode())
+
+s.close()
+```
+
+方法3 - 使用 curl (如果是HTTP服务):
+```bash
+curl http://108.68.49.98:6957/get_cmd
+```
+
+方法4 - 使用 telnet:
+```bash
+telnet 108.68.49.98 6957
+# 连接后输入: get_cmd
+```
+
+**备选端口** (如果6957不工作):
+- 108.68.49.98:97
+- 108.68.49.98:14661
+- 108.68.49.98:17721
 
 *Note: The actual flag value requires a live network connection to the C2 server, which is only available during the CTF competition time window. The format should be ISCTF{...}*
 
