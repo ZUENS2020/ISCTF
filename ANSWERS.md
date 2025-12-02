@@ -31,23 +31,23 @@ msiexec.exe /i TJe1w TRANSFORMS=fR6Wl /qn
 ---
 
 ### 问题4: 第一阶段中恶意载荷释放的文件名分别为
-**答案1: zRC.dll**
-**答案2: zRC.dat** 
-**答案3: ISCTF2025.pdf** (PDF诱饵文件，从资源中提取并释放)
+**答案1: zRCAppCore.dll** (恶意DLL，伪装成Zoom合法DLL)
+**答案2: zRC.dat** (数据文件)
+**答案3: ISCTF2025.pdf** (PDF诱饵文件)
 
-分析: Transform文件(fR6Wl)修改MSI安装包:
-- 安装恶意DLL (zRC.dll) 替代合法Zoom DLL
-- 释放数据文件 (zRC.dat) 用于Stage 3
-- 释放PDF诱饵文件并用ShellExecute打开
+分析: Transform文件(fR6Wl)修改MSI安装包后，zRC.dll从资源中提取并释放:
+- 恶意DLL写入 `\ZoomRemoteControl\bin\zRCAppCore.dll`
+- 数据文件写入 `\ZoomRemoteControl\bin\zRC.dat`
+- PDF诱饵文件 `\ISCTF2025.pdf` 并用ShellExecute打开
 
 ---
 
 ### 问题5: 第二阶段使用了一种常见的白加黑技巧，其中黑文件名为
-**答案: zRC.dll**
+**答案: zRCAppCore.dll**
 
 分析: 白加黑(DLL Side-Loading)技巧:
-- 白文件: Zoom合法程序(ZoomRemoteControl.exe等)
-- 黑文件: zRC.dll (恶意DLL，导出GetZoomRCAppCore函数伪装成zRCAppCore.dll)
+- 白文件: ZoomRemoteControl.exe (Zoom合法程序)
+- 黑文件: zRCAppCore.dll (恶意DLL，导出GetZoomRCAppCore函数伪装成合法Zoom组件)
 
 ---
 
@@ -82,9 +82,13 @@ msiexec.exe /i TJe1w TRANSFORMS=fR6Wl /qn
 ---
 
 ### 问题10: 第三阶段载荷获取命令的回连地址为（格式：IP:端口）
-**答案: (需要从SharePoint下载的配置中获取)**
+**答案: (需要动态运行获取 - C2地址可能从SharePoint下载的配置文件中动态获取)**
 
-分析: 恶意程序首先从SharePoint下载配置文件，实际的命令控制服务器IP:端口可能在配置文件中动态获取。在静态分析的二进制中未找到硬编码的IP:端口。
+分析: 
+- 静态分析中未发现硬编码的IP:端口
+- 恶意程序首先从SharePoint下载配置
+- 配置中的字符串 `lD1bZ0` 和 `E9dE7d` 可能是C2通信的密钥或标识符
+- 实际C2地址需要动态分析或访问题目环境获取
 
 ---
 
@@ -96,7 +100,11 @@ msiexec.exe /i TJe1w TRANSFORMS=fR6Wl /qn
 ---
 
 ### 问题12: 访问最终回连地址得到flag
-**答案: (需要访问实际C2服务器获取)**
+**答案: (需要访问实际C2服务器获取 - 需在题目环境中运行获取)**
+
+分析: Flag需要通过访问C2服务器获取。这可能需要:
+1. 在题目指定的环境中运行恶意程序
+2. 或者直接访问题目提供的C2服务器地址
 
 ---
 
@@ -116,7 +124,9 @@ msiexec.exe /i TJe1w TRANSFORMS=fR6Wl /qn
 | 指标类型 | 值 |
 |---------|-----|
 | 入口文件 | ISCTF基础规则说明文档.pdf.lnk |
-| 恶意DLL | zRC.dll |
+| 恶意DLL (黑文件) | zRCAppCore.dll |
+| 释放的数据文件 | zRC.dat |
+| PDF诱饵 | ISCTF2025.pdf |
 | C2域名 | colonised-my.sharepoint.com |
 | User-Agent | Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36 Edg/142.0.0.0 |
 | 持久化 | 计划任务 ZoomUpdater (每小时执行) |
